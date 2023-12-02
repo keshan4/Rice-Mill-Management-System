@@ -1,0 +1,182 @@
+Create table Farmer(F_ID Int NOT NULL Identity(100,1) Primary key,First_name Varchar(20),Last_Name Varchar(20),Phone_Number Varchar(15),Address Varchar(50));
+Create table BuyingStore(Date date,BP_ID Int NOT NULL Identity(2000,1) Primary key,Dry_Or_Wet Varchar(10),Paddy_Type Varchar(20),Quantity Decimal(15,2),Unit_Price Decimal(15,2),Total Decimal(15,2));
+Create table SellingStore(Date date,SR_ID Int NOT NULL Identity(3000,1) Primary key,Rice_Type Varchar(20),Unit_Price Decimal(15,2),Quantity Int,Total Decimal(15,2),BP_ID Int Foreign key References BuyingStore(BP_ID));
+Create table Seller(First_name Varchar(20),Last_Name Varchar(20),Phone_Number Varchar(15),Address Varchar(50),S_ID Int NOT NULL Identity(10000,1) Primary key);
+Create table FarmerBuyingStore(F_ID Int NOT NULL,BP_ID Int NOT NULL,Primary key(F_ID,BP_ID),Constraint FK_FarmerBuyingStore_Farmer Foreign key (F_ID) References Farmer(F_ID),Constraint FK_FarmerBuyingStore_BuyingStore Foreign key (BP_ID) References BuyingStore(BP_ID));
+Create table SellerSellingStore(S_ID Int,SR_ID Int,Primary key(S_ID,SR_ID),Constraint SellerSellingStore_Seller Foreign key (S_ID) References Seller(S_ID),Constraint SellerSellingStore_SellingStore Foreign key (SR_ID) References SellingStore(SR_ID));
+Create table SeedsStock(SID Varchar(5) NOT NULL Primary key,Dry_Or_Wet Varchar(10),Paddy_Type Varchar(20),Wet Decimal(15,2),Dry Decimal(15,2),BP_ID Int Foreign key References BuyingStore(BP_ID));
+Create table RiceStock(RID Varchar(5) NOT NULL Primary key,Rice_Type Varchar(20),"5kg_Packets" Int,"10kg_Packets" Int,"25kg_Packets" Int);
+
+Create table SeedsUnitPrice(SU_ID Varchar(5) NOT NULL Primary key,Dry_Or_Wet Varchar(10),Price Decimal(15,2),SID Varchar(5),Foreign key (SID) References SeedsStock(SID));
+Create table RiceBagsUnitPrice(RU_ID Varchar(5) NOT NULL Primary key,Packet Varchar(20),Price Decimal(15,2),RID Varchar(5),Foreign key (RID) References RiceStock(RID));
+Create table LoginUser(Username Varchar(50),Password Varchar(50));
+Create table RiceStockSellingStore(RID Varchar(5),SR_ID Int,Primary key(RID,SR_ID),Constraint RiceStockSellingStore_RiceStock Foreign key (RID) References RiceStock(RID),Constraint RiceStockSellingStore_SellingStore Foreign key (SR_ID) References SellingStore(SR_ID));
+/*Create table Seeds(S_ID Varchar(5) NOT NULL Primary key,Dry_Or_Wet Varchar(10),Paddy_Type Varchar(20));
+Create table Rice(R_ID Varchar(5) NOT NULL Primary key,Rice_Type Varchar(20));*/
+
+Insert into LoginUser Values('admin','admin');
+
+Insert into SeedsStock values('S01','Dry','Samba',00.00,00.00,Null);
+Insert into SeedsStock values('S02','Wet','Samba',00.00,00.00,Null);
+Insert into SeedsStock values('S03','Dry','Nadu',00.00,00.00,Null);
+Insert into SeedsStock values('S04','Wet','Nadu',00.00,00.00,Null);
+Insert into SeedsStock values('S05','Dry','Keeri Samba',00.00,00.00,Null);
+Insert into SeedsStock values('S06','Wet','Keeri Samba',00.00,00.00,Null);
+
+Insert into RiceStock values('R01','Samba',0,0,0);
+Insert into RiceStock values('R02','Nadu',0,0,0);
+Insert into RiceStock values('R03','Keeri Samba',0,0,0);
+
+Insert into RiceBagsUnitPrice Values('RU01','5kg',1050.00,'R01');
+Insert into RiceBagsUnitPrice Values('RU02','10kg',2100.00,'R01');
+Insert into RiceBagsUnitPrice Values('RU03','25kg',5250.00,'R01');
+Insert into RiceBagsUnitPrice Values('RU04','5kg',950.00,'R02');
+Insert into RiceBagsUnitPrice Values('RU05','10kg',1900.00,'R02');
+Insert into RiceBagsUnitPrice Values('RU06','25kg',4750.00,'R02');
+Insert into RiceBagsUnitPrice Values('RU07','5kg',1150.00,'R03');
+Insert into RiceBagsUnitPrice Values('RU08','10kg',2300.00,'R03');
+Insert into RiceBagsUnitPrice Values('RU09','25kg',5750.00,'R03');
+
+Insert into SeedsUnitPrice Values('SU01','Dry',130.00,'S01');
+Insert into SeedsUnitPrice Values('SU02','Wet',120.00,'S02');
+Insert into SeedsUnitPrice Values('SU03','Dry',110.00,'S03');
+Insert into SeedsUnitPrice Values('SU04','Wet',100.00,'S04');
+Insert into SeedsUnitPrice Values('SU05','Dry',160.00,'S05');
+Insert into SeedsUnitPrice Values('SU06','Wet',150.00,'S06');
+
+---------------------------------------------------------------------------------------------------------
+
+Select * from RiceStockSellingStore;
+Select * from SeedsStock;
+Select * from RiceStock;
+
+Drop table SeedsStock;
+Drop table RiceStock;
+
+
+Select * From INFORMATION_SCHEMA.TABLES;
+Select * from Farmer;
+Select * from BuyingStore;
+Select * from SellingStore;
+Select * from Seller;
+Select * from FarmerBuyingStore;
+Select * from SellerSellingStore;
+
+drop table FarmerBuyingStore;
+drop table SellerSellingStore;
+drop table SellingStore;
+drop table Farmer;
+drop database PaddyDB;
+drop table RiceBagsUnitPrice;
+
+
+Insert into Farmer values('Vikum','Dineth','0123456789','450/2/Kandy');
+Insert into BuyingStore values(01,'2023-01-01','Samba wee',50.45,30.56);
+
+Select * from Farmer,BuyingStore where F_ID=1;
+Select First_name,Paddy_Type from Farmer,BuyingStore where F_ID=1;
+
+-------------------------------------------------
+
+INSERT INTO BuyingStore (Quantity, Unit_Price)
+VALUES (5, 10.99),
+       (3, 8.50),
+       (2, 5.25);
+
+/*******************Function*******************/
+-- Create a function to calculate the total
+
+CREATE FUNCTION calculate_total
+    (@quantity INT, @unit_price DECIMAL(10, 2))
+RETURNS DECIMAL(10, 2)
+AS
+BEGIN
+    DECLARE @total DECIMAL(10, 2);
+    
+    SET @total = @quantity * @unit_price;
+    
+    RETURN @total;
+END;
+
+-- Update the Total column using the function
+UPDATE BuyingStore
+SET Total = dbo.calculate_total(Quantity, Unit_Price);
+
+-- Display the updated table
+SELECT * FROM BuyingStore;
+
+
+/*******************DML Triggers*******************/
+
+Create Trigger TRG_Delete_Rule
+On BuyingStore
+For Delete
+AS
+Begin
+	Rollback
+	Print '**********************************************'
+	Print 'You cannot delete records from this table'
+	Print '**********************************************'
+End
+Go
+
+/*******************DDL Triggers*******************/
+
+Create Trigger Trg_PaddyDB
+On Database
+For create_table
+AS
+Begin
+	Rollback
+	Print '*****************************************'
+	Print 'You are not allowed to create tables!'
+	Print '*****************************************'
+End
+
+/*******************List All Triggers*******************/
+
+Select * from sys.triggers;
+
+/*******************Disable/Enable Triggers*******************/
+
+Disable Trigger TRG_Delete_Rule ON BuyingStore
+Go
+
+Enable Trigger TRG_Delete_Rule ON BuyingStore
+Go
+
+/*******************Drop Triggers*******************/
+
+Drop Trigger TRG_Delete_Rule
+Goa
+
+
+/*******************Upadate Stored Procedure*******************/
+
+CREATE PROCEDURE UpdateAnotherTable
+    @InputValue1 [datatype],
+    @InputValue2 [datatype],
+    ... -- Add more input parameters as needed
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Insert values into the first table
+    INSERT INTO FirstTable (Column1, Column2, ...)
+    VALUES (@InputValue1, @InputValue2, ...);
+
+    -- Update columns in the second table based on the inserted values
+    UPDATE SecondTable
+    SET ColumnA = @InputValue1,
+        ColumnB = @InputValue2,
+        ...
+    WHERE <condition>; -- Add the appropriate condition for updating the desired rows
+
+    -- Add more update statements if needed for additional columns in the second table
+
+    -- Optional: Retrieve the updated rows from the second table
+    SELECT *
+    FROM SecondTable
+    WHERE <condition>; -- Add the same condition used in the UPDATE statement
+
+END;
